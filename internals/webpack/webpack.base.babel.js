@@ -114,7 +114,8 @@ module.exports = options => ({
     // drop any unreachable code.
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      HASH_LINKED_LOGGER_URL: process.env.HASH_LINKED_LOGGER_URL,
+      HASH_LINKED_LOGGER_URL:
+        process.env.HASH_LINKED_LOGGER_URL || 'http://localhost:8080',
     }),
   ]),
   resolve: {
