@@ -6,7 +6,6 @@ import {
 } from './constants';
 
 export function loadLogs() {
-  console.log('loading logs');
   return {
     type: LOAD_LOGS,
   };

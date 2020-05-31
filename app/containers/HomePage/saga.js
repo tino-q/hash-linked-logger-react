@@ -1,55 +1,37 @@
 /* eslint-disable no-plusplus */
-/**
- * Gets the repositories of the user from Github
- */
-
-import { put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import { LOAD_LOGS, CREATE_LOG_ENTRY } from 'containers/App/constants';
 import { logsLoaded, apiError, loadLogs } from 'containers/App/actions';
+import { get, post } from 'utils/request';
+import env from '../../environment';
 
-// import request from 'utils/request';
 let ids = 0;
-const logs = [];
-
-/* id => ({
-  id,
-  date: 'date',
-  message: 'message',
-} */
 
 export function* getLogs() {
-  // Select username from store
-  // const requestURL = `https://api.github.com/users/${username}/repos?type=all&sort=updated`;
-
   try {
-    console.log('getLogs');
-    // Call our request helper (see 'utils/request')
-    // const repos = yield call(request, requestURL);
-    yield put(logsLoaded(logs));
+    const { data } = yield call(get, `${env.HASH_LINKED_LOGGER_URL}/logs`);
+    const mappedLogs = data.logs.map(([date, message]) => ({
+      id: ++ids,
+      message,
+      date,
+    }));
+    yield put(logsLoaded(mappedLogs));
   } catch (err) {
     yield put(apiError(err));
   }
 }
 
-export function* createLogEntry(msg) {
+export function* createLogEntry(action) {
   try {
-    // yield call(request, 'requestURL/postmessage + msg');
-    // yield put(logsLoaded();
-    logs.push({
-      id: ++ids,
-      message: msg.msg,
-      date: new Date().toISOString(),
-    });
+    const { msg: message } = action;
+    yield call(post, `${env.HASH_LINKED_LOGGER_URL}/logs/entry`, { message });
     yield put(loadLogs());
   } catch (err) {
     yield put(apiError(err));
   }
 }
 
-/**
- * Root saga manages watcher lifecycle
- */
-export default function* githubData() {
+export default function* logData() {
   yield takeLatest(LOAD_LOGS, getLogs);
   yield takeLatest(CREATE_LOG_ENTRY, createLogEntry);
 }

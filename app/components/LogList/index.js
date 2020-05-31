@@ -7,15 +7,20 @@ import LoadingIndicator from 'components/LoadingIndicator';
 import LogListItem from 'containers/LogListItem';
 
 function LogList({ loading, error, logs }) {
-  console.log({ logList: { loading, error, logLength: logs && logs.length } });
   if (loading) {
     return <List component={LoadingIndicator} />;
   }
 
   if (error) {
-    const ErrorComponent = () => (
-      <ListItem item="Something went wrong, please try again!" />
-    );
+    let msg;
+    switch (error) {
+      case 'corrupted_log_file':
+        msg = 'Database integrity has been compromised';
+        break;
+      default:
+        msg = 'Something went wrong, please try again!';
+    }
+    const ErrorComponent = () => <ListItem item={msg} />;
     return <List component={ErrorComponent} />;
   }
 

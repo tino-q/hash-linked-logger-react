@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.li`
   width: 100%;
-  height: 3em;
+  height: 100%;
   display: flex;
   align-items: center;
   position: relative;
