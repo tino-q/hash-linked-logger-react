@@ -1,7 +1,9 @@
 # Hash Linked Logger 
 
+Forked from [React Boilerplate](https://github.com/react-boilerplate/react-boilerplate)
+
 &nbsp;
-**Keep your log history secure and immutable!**
+**Keep your log history immutable!**
 
 <img alt="App" src="./banner.png">
 
