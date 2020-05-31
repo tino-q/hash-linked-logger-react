@@ -12,6 +12,9 @@ const appReducer = (state = initialState, action) =>
   produce(state, draft => {
     switch (action.type) {
       case API_ERROR:
+        if (action.error === 'invalid_schema') {
+          alert('Your message was invalid');
+        }
         draft.loading = false;
         draft.error = action.error;
         draft.logs = null;

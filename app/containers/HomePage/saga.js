@@ -13,7 +13,7 @@ export function* getLogs() {
     const mappedLogs = data.logs.map(([date, message]) => ({
       id: ++ids,
       message,
-      date,
+      date: new Date(Date.parse(date)).toString(),
     }));
     yield put(logsLoaded(mappedLogs));
   } catch (err) {
@@ -25,6 +25,11 @@ export function* createLogEntry(action) {
   try {
     const { msg: message } = action;
     yield call(post, `${env.HASH_LINKED_LOGGER_URL}/logs/entry`, { message });
+  } catch (err) {
+    yield put(apiError(err));
+  }
+
+  try {
     yield put(loadLogs());
   } catch (err) {
     yield put(apiError(err));

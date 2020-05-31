@@ -32,7 +32,6 @@ export function HomePage({ loading, error, logs, onNeedLogs, onSubmitForm }) {
 
   const logListProps = {
     loading,
-    error,
     logs,
   };
 
@@ -64,7 +63,7 @@ export function HomePage({ loading, error, logs, onNeedLogs, onSubmitForm }) {
                 <Input
                   id="username-search"
                   type="text"
-                  placeholder="type your message here and press enter to send"
+                  placeholder="Type your message here and press enter to send it!"
                   value={draftMessage}
                   onChange={i => setDraftMessage(i.target.value)}
                   autoComplete="off"
