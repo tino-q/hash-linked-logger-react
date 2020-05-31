@@ -1,30 +1,54 @@
+/* eslint-disable no-unused-expressions */
 /*
  * HomePage
  *
  * This is the first thing users see of our App, at the '/' route
  */
-
-import React, { memo } from 'react';
+import PropTypes from 'prop-types';
+import React, { memo, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
-
-import { useInjectReducer } from 'utils/injectReducer';
+import {
+  makeSelectLogs,
+  makeSelectLoading,
+  makeSelectError,
+} from 'containers/App/selectors';
+import { loadLogs, createLogEntry } from 'containers/App/actions';
+// import { useInjectReducer } from 'utils/injectReducer';
 import { useInjectSaga } from 'utils/injectSaga';
-import H2 from 'components/H2';
+import H3 from 'components/H3';
+import LogList from 'components/LogList';
 import CenteredSection from './CenteredSection';
-import Section from './Section';
+import Form from './Form';
+import Input from './Input';
 import messages from './messages';
-import reducer from './reducer';
+// import reducer from './reducer';
 import saga from './saga';
 
 const key = 'home';
 
-export function HomePage() {
-  useInjectReducer({ key, reducer });
+export function HomePage({ loading, error, logs, onNeedLogs, onSubmitForm }) {
+  // useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
+
+  const [draftMessage, setDraftMessage] = useState('');
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+    } else if (logs === null) {
+      onNeedLogs();
+    }
+  }, []);
+
+  const logListProps = {
+    loading,
+    error,
+    logs,
+  };
 
   return (
     <article>
@@ -37,29 +61,66 @@ export function HomePage() {
       </Helmet>
       <div>
         <CenteredSection>
-          <H2>
-            <FormattedMessage {...messages.startProjectHeader} />
-          </H2>
-          <p>
-            <FormattedMessage {...messages.startProjectMessage} />
-          </p>
+          <H3>
+            <FormattedMessage {...messages.enterLog} />
+          </H3>
         </CenteredSection>
-        <Section>
-          <H2>
-            <FormattedMessage {...messages.trymeHeader} />
-          </H2>
-        </Section>
+
+        <Form
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!e.shiftKey) {
+                onSubmitForm(draftMessage);
+              } else {
+                setDraftMessage(`${draftMessage}\n`);
+              }
+            }
+          }}
+          // onSubmit={e => {
+          //   debugger;
+          //   e && e.preventDefault && e.preventDefault();
+          //   onSubmitForm(draftMessage);
+          // }}
+        >
+          <label htmlFor="username">
+            <Input
+              id="username-search"
+              type="text"
+              placeholder="type your message here"
+              value={draftMessage}
+              onChange={i => setDraftMessage(i.target.value)}
+            />
+          </label>
+        </Form>
+
+        <LogList {...logListProps} />
       </div>
     </article>
   );
 }
 
-HomePage.propTypes = {};
+HomePage.propTypes = {
+  loading: PropTypes.bool,
+  error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  logs: PropTypes.array,
+  onNeedLogs: PropTypes.func,
+  onSubmitForm: PropTypes.func,
+  onChangeDraftMessage: PropTypes.func,
+};
 
-const mapStateToProps = createStructuredSelector({});
+const mapStateToProps = createStructuredSelector({
+  logs: makeSelectLogs(),
+  loading: makeSelectLoading(),
+  error: makeSelectError(),
+});
 
-export function mapDispatchToProps() {
-  return {};
+export function mapDispatchToProps(dispatch) {
+  return {
+    onNeedLogs: () => dispatch(loadLogs()),
+    onSubmitForm: msg => dispatch(createLogEntry(msg)),
+  };
 }
 
 const withConnect = connect(
