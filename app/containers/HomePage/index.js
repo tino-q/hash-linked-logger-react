@@ -52,7 +52,7 @@ export function HomePage({ loading, error, logs, onNeedLogs, onSubmitForm }) {
           <div style={{ marginTop: '20px' }}>
             <Form
               onKeyDown={e => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && draftMessage.length) {
                   e.preventDefault();
                   e.stopPropagation();
                   onSubmitForm(draftMessage);
